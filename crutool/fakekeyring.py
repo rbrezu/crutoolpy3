@@ -5,7 +5,7 @@
 
 import getpass
 
-print "'pip install keyring' to enhance your experience!"
+print("'pip install keyring' to enhance your experience!")
 
 def get_password(self, context, user):
   return getpass.getpass("[%s] %s's Password:" % (context, user))

@@ -13,7 +13,7 @@ from string import Formatter
 def dict_merge(a, b):
     if not isinstance(b, dict):
         return b
-    for k, v in b.iteritems():
+    for k, v in b.items():
         if k in a and isinstance(a[k], dict):
                 a[k] = dict_merge(a[k], v)
         else:
@@ -46,7 +46,7 @@ class CRUToolConfig(object):
   def saveUserFile(self):
     if self.dirty:
       f = open(self.userFilePath, "w")
-      print >>f, self.userConfig
+      print(self.userConfig, file=f)
       f.close()
 
   def get(self, section, key, defaultValue=None, exception=False):

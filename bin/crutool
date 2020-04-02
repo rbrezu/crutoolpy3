@@ -63,14 +63,14 @@ class CRUTool(object):
       cr = self.cru.reviewForIssue(issue)
       if cr is None:
         raise UsageException(self.cru_review, "No open reviews for %s" % issue)
-      print "Using %s for issue %s" % (cr, issue)
+      print("Using %s for issue %s" % (cr, issue))
     elif ISSUE_RE.match(cr) and cr[:2] != "CR":
       # TODO possibly CR is configurable...
       issue = cr
       cr = self.cru.reviewForIssue(cr)
       if cr is None:
         raise UsageException(self.cru_review, "No open reviews for %s" % issue)
-      print "Using %s for issue %s" % (cr, issue)
+      print("Using %s for issue %s" % (cr, issue))
       config.set("cache", "lastissue", issue)
     elif cr[:2] != "CR":
       raise UsageException(self.cru_review, "Unknown review %s" % cr)
@@ -98,7 +98,7 @@ class CRUTool(object):
       target = args[0]
 
       if target in gitrepo.heads:
-        print "has head",gitrepo.heads[target].commit
+        print("has head",gitrepo.heads[target].commit)
         # There is a such head, its not a changeset. Compare to it
         csets = []
         for cherry in gitrepo.git.cherry(target).split("\n"):
@@ -117,13 +117,13 @@ class CRUTool(object):
       repo = args[0]
       csets = args[1:]
 
-    print "Adding %d changesets to %s" % (len(csets), cr)
+    print("Adding %d changesets to %s" % (len(csets), cr))
 
     res = self.cru.addChangeset(cr, repo, csets)
     if "name" in res:
-      print "Success"
+      print("Success")
     else:
-      print "An Error occurred",res
+      print("An Error occurred",res)
 
 
   def cru_review_create(self, args):
@@ -175,7 +175,7 @@ class CRUTool(object):
       else:
         csetmsg = "%d changesets" % len(csets)
 
-      print "Creating %s review for %s in %s with %s" % (project, issue, repo, csetmsg)
+      print("Creating %s review for %s in %s with %s" % (project, issue, repo, csetmsg))
     else:
       # User provides all details
       project = args[0]
@@ -189,7 +189,7 @@ class CRUTool(object):
     # Make sure at least one of the changesets has been scanned to avoid draft reviews
     cset = self.cru.commitInfo(repo, csets[0])
     if cset is None:
-      print "Changeset %s has not been processed by fisheye, please try again later" % (csets[0])
+      print("Changeset %s has not been processed by fisheye, please try again later" % (csets[0]))
     else:
       # Finally, create the review
       review = self.cru.createReview(project, issue, repo, name, csets)
@@ -197,7 +197,7 @@ class CRUTool(object):
       if review and "permaId" in review and "id" in review["permaId"]:
         cr = review["permaId"]["id"]
         htmlLink = "%s/cru/%s" % (config.require("defaults", "cru_base"), cr)
-        print "Created review for %s at %s" % (issue, htmlLink)
+        print("Created review for %s at %s" % (issue, htmlLink))
 
         # Set the last issue to this issue for further processing
         config.set("cache", "lastissue", issue.encode('utf-8'))
@@ -205,7 +205,7 @@ class CRUTool(object):
         # If the user wants us to transition the issue, do it now
         self.cru_review_transition_hook(cr, "create", issue)
       else:
-        print "An error occurred:",review
+        print("An error occurred:",review)
 
   def cru_review_transition_hook(self, cr, action, issue=None):
     transition = config.get("review", "%s_jira_transition" % action, None)
@@ -222,13 +222,13 @@ class CRUTool(object):
                   "Could not deduce issue from review information")
 
         # Now set the issue status
-        print "Review has been set to '%s', setting %s status to '%s'" % (action, issue, transition)
+        print("Review has been set to '%s', setting %s status to '%s'" % (action, issue, transition))
         self.jira_set(issue, [transition])
       except UsageException as e:
         # Either jira_set or the try block itself may throw a UsageException.
         # Since the important part of this command is to close the review, just
         # show a warning message
-        print "Warning: %s, not updating JIRA issue" % e.message
+        print("Warning: %s, not updating JIRA issue" % e.message)
 
   def cru_review_show(self, cr, args, issue=None):
     """Usage: crutool review <issue_or_cr> show"""
@@ -238,13 +238,12 @@ class CRUTool(object):
 
   def cru_review_set(self, cr, args, issue=None):
     """Usage: crutool review <issue_or_cr> set <status>""" 
-    transitions = map(lambda x: x["displayName"].lower(),
-                      self.cru.getTransitions(cr)["transitionData"])
+    transitions = [x["displayName"].lower() for x in self.cru.getTransitions(cr)["transitionData"]]
 
     # Ask for transition if the argument is missing
     if len(args) < 1:
       opts,prompt = textOptions({ v: v for v in transitions })
-      ch = raw_input(prompt + " ? ")
+      ch = input(prompt + " ? ")
       action = opts[ch.lower()]
     else:
       action = args[0]
@@ -262,7 +261,7 @@ class CRUTool(object):
       raise UsageException(self.cru_review_set,
                            "Invalid transition (expected: %s)" % \
                              (",".join(transitions)))
-    print "Status %s set successfully" % action
+    print("Status %s set successfully" % action)
 
     # If configured, transition the matching issue
     self.cru_review_transition_hook(cr, action, issue)
@@ -353,9 +352,9 @@ class CRUTool(object):
       smtp.sendmail(config.require("smtp", "from"),
                     config.require("smtp", "recipients"), msg)
       smtp.quit()
-      print "Success"
+      print("Success")
     else:
-      print "Canceled"
+      print("Canceled")
 
 
   # jira commands
@@ -390,8 +389,8 @@ class CRUTool(object):
 
   def jira_create(self, args):
     # Put this here for the future, and in case someone assumes it exists
-    print "Sorry, the version this tool is designed for (Jira 4.x) is " + \
-          "not capable of creating issues via API"
+    print("Sorry, the version this tool is designed for (Jira 4.x) is " + \
+          "not capable of creating issues via API")
 
   def jira_transitions(self, issue, args):
     """Usage: crutool jira <issue> transitions"""
@@ -405,7 +404,7 @@ class CRUTool(object):
       opts,prompt = textOptions({
         v["name"]: v for v in transitions["transitions"]
       })
-      ch = raw_input(prompt + " ? ")
+      ch = input(prompt + " ? ")
       transInfo = opts[ch.lower()]
     elif len(args) == 1:
       for v in transitions["transitions"]:
@@ -421,7 +420,7 @@ class CRUTool(object):
     fields = None
     if len(transInfo["fields"]):
       fields = {}
-      for name,field in transInfo["fields"].iteritems():
+      for name,field in transInfo["fields"].items():
         fieldStrings = ''
         opts = {}
 
@@ -432,14 +431,14 @@ class CRUTool(object):
           fieldStrings = ' (%s)' % prompt
 
         req = "required" if field["required"] else "optional"
-        val = raw_input("[%s] %s%s: " % (req, name, fieldStrings))
+        val = input("[%s] %s%s: " % (req, name, fieldStrings))
         if field["required"] or len(val):
           if val.lower() in opts:
             val = opts[val.lower()]
 
           if field['schema']['type'] == 'array':
             fieldvals = re.split(r"[,\s]+", val)
-            fields[name] = map(lambda x: { 'name': x }, fieldvals)
+            fields[name] = [{ 'name': x } for x in fieldvals]
           else:
             fields[name] = { 'name': val }
 
@@ -546,17 +545,17 @@ class CRUTool(object):
     if issue is None: raise UsageException(self.cru_review_create, "Commit message does not contain issue id (%s)" % csets[0].message)
     issue = issue.group(0)
 
-    messages = map(lambda x: gitrepo.commit(x).message.strip(), csets)
+    messages = [gitrepo.commit(x).message.strip() for x in csets]
 
     if len(csets) < 5:
-      csetmsg = "\n".join(map(lambda x: " - ".join(x), zip(csets, messages)))
+      csetmsg = "\n".join([" - ".join(x) for x in zip(csets, messages)])
       csetmsg = "changesets:\n" + csetmsg
     else:
       csetmsg = "%d changesets" % len(csets)
 
-    print "Creating pull request for %s using %s/%s -> %s/%s with %s" % (issue, thisproject, gitrepo.active_branch, targetproject, target, csetmsg)
+    print("Creating pull request for %s using %s/%s -> %s/%s with %s" % (issue, thisproject, gitrepo.active_branch, targetproject, target, csetmsg))
 
-    description = "\n".join(map(lambda x: gitrepo.commit(x).message.strip(), csets))
+    description = "\n".join([gitrepo.commit(x).message.strip() for x in csets])
 
     self.stash.createPullrequest(
       title=message,
@@ -594,7 +593,7 @@ class CRUTool(object):
       except keyring.errors.PasswordDeleteError:
         pass
 
-    print "Authentication cleared"
+    print("Authentication cleared")
 
   # api methods
   def api_call(self, args):
@@ -611,11 +610,11 @@ class CRUTool(object):
     api = getattr(self, api)
     method = getattr(api, method)
 
-    print json_pp(method(uri, params=params))
+    print(json_pp(method(uri, params=params)))
 
   # last issue
   def lastissue(self, args):
-    print config.get("cache", "lastissue", "")
+    print(config.get("cache", "lastissue", ""))
 
   # main method
 
@@ -670,13 +669,13 @@ class CRUTool(object):
     except LoginFailedException as e:
       self.auth_clear([])
       if e.reason == "AUTHENTICATION_DENIED":
-        print "Login failed too many times. Please log in once via " + \
-              "the web interface and try again"
+        print("Login failed too many times. Please log in once via " + \
+              "the web interface and try again")
       else:
-        print "Login Failed (%s)" % e.reason
+        print("Login Failed (%s)" % e.reason)
         self.main(args)
     except UsageException as e:
-      print e
+      print(e)
     except KeyboardInterrupt:
       pass
 

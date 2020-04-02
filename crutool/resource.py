@@ -3,12 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # Portions Copyright (C) Philipp Kewisch, 2013
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 from .exceptions import *
 import socks
 import httplib2
 import base64
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import os
 from .config import config
@@ -47,7 +47,7 @@ class Resource(object):
       kwargs['body'] = json.dumps(kwargs['body'])
 
     if 'params' in kwargs:
-      uri = uri + '?' + urllib.urlencode(kwargs['params'])
+      uri = uri + '?' + urllib.parse.urlencode(kwargs['params'])
       del kwargs['params']
 
     return http, uri

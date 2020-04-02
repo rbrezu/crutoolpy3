@@ -18,29 +18,29 @@ class JSONDisplayer(object):
     fields["htmlURL"] = htmlLink
     # Uncomment to edit template:
     # print json_pp(fields)
-    print config.format("templates", "issue", fields)
+    print(config.format("templates", "issue", fields))
 
   @staticmethod
   def jiraTransitions(obj):
     for trans in obj["transitions"]:
       fields = []
-      for name, field in trans["fields"].iteritems():
+      for name, field in trans["fields"].items():
         if field["required"]:
           fields.append("\033[1m%s\033[0m" % name)
         else:
           fields.append(name)
-      print "%s (%s)" % (trans["name"], ",".join(fields))
+      print("%s (%s)" % (trans["name"], ",".join(fields)))
 
   @staticmethod
   def jiraDashboard(obj):
     # print json_pp(obj)
     for issue in obj["issues"]:
-      print "%s - %s" % (issue["key"], issue["fields"]["summary"])
+      print("%s - %s" % (issue["key"], issue["fields"]["summary"]))
 
     total = int(obj["total"])
     maxres = int(obj["maxResults"])
     if total > maxres:
-      print "... (%d more)" % (total - maxres)
+      print("... (%d more)" % (total - maxres))
 
 
   @staticmethod
@@ -122,7 +122,7 @@ class JSONDisplayer(object):
 
     # Uncomment to edit template:
     # print json_pp(obj)
-    print config.format("templates", "review", obj)
+    print(config.format("templates", "review", obj))
 
   @staticmethod
   def pullRequest(obj):
@@ -131,12 +131,12 @@ class JSONDisplayer(object):
   @staticmethod
   def stashProjects(obj, baseUri):
     for project in obj["values"]:
-      print "{: >10} {: <30} {: <20}".format(project["key"], project["name"], baseUri + project['link']['url'])
+      print("{: >10} {: <30} {: <20}".format(project["key"], project["name"], baseUri + project['link']['url']))
     
   @staticmethod
   def stashRepos(obj):
     for repos in obj["values"]:
-      print "{: <40} {}".format(repos["name"] + ":", repos["cloneUrl"])
+      print("{: <40} {}".format(repos["name"] + ":", repos["cloneUrl"]))
 
   @staticmethod
   def stashPullrequests(obj, baseUri):
@@ -165,4 +165,4 @@ class JSONDisplayer(object):
       pr["fmt_reviewers_completed_color"] = ", ".join(reviewers_completed_color)
       pr["fmt_baseUri"] = baseUri
 
-      print config.format("templates", "stashPullrequest", pr),"\n"
+      print(config.format("templates", "stashPullrequest", pr),"\n")

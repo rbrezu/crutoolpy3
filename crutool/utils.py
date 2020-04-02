@@ -26,7 +26,7 @@ def json_pp(obj):
 def textOptions(kv):
   optprompt = []
   opts = {}
-  for s,v in kv.iteritems():
+  for s,v in kv.items():
     x = 0
     while x < len(s) and s[x] in string.ascii_letters and s[x].lower() in opts:
       x += 1
@@ -71,7 +71,7 @@ def translatePlaceholder(placeholder, asReview=False):
     if placeholder == "_":
       issue = config.get("cache", "lastissue")
       if issue is not  None:
-        print "Using last issue %s" % issue
+        print("Using last issue %s" % issue)
     elif placeholder == "@" and gitSupport:
       root = gitroot(os.getcwd())
       repo = git.Repo(root)
@@ -79,7 +79,7 @@ def translatePlaceholder(placeholder, asReview=False):
       issueMatch = ISSUE_RE.search(branch)
       if issueMatch is not None:
         issue = issueMatch.group(0)
-        print "Using issue %s from git branch" % issue
+        print("Using issue %s from git branch" % issue)
     return issue
 
 
